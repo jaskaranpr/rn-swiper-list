@@ -2,7 +2,7 @@ import { createRef, useCallback, useMemo, type RefObject } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
 import type { SwiperCardRefType } from 'rn-swiper-list';
 
-const useSwipeControls = <T>(data: T[], loop: boolean = false) => {
+const useSwipeControls = <T>(data: T[], loop: boolean = true) => {
   const activeIndex = useSharedValue(0);
 
   const refs = useMemo(() => {

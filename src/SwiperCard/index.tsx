@@ -28,6 +28,7 @@ const SwipeableCard = forwardRef<
   (
     {
       index,
+      totalLength,
       activeIndex,
       onSwipeLeft,
       onSwipeRight,
@@ -67,7 +68,8 @@ const SwipeableCard = forwardRef<
     },
     ref
   ) => {
-    const translateX = useSharedValue(0);
+    const intValue = totalLength - 1 === index ? -30 : totalLength - 2 === index ? 30 : 0
+    const translateX = useSharedValue(intValue);
     const translateY = useSharedValue(0);
     const currentActiveIndex = useSharedValue(Math.floor(activeIndex.value));
     const nextActiveIndex = useSharedValue(Math.floor(activeIndex.value));
@@ -134,7 +136,7 @@ const SwipeableCard = forwardRef<
     const swipeBack = useCallback(() => {
       cancelAnimation(translateX);
       cancelAnimation(translateY);
-      translateX.value = withSpring(0, swipeBackXSpringConfig);
+      translateX.value = withSpring(intValue, swipeBackXSpringConfig);
       translateY.value = withSpring(0, swipeBackYSpringConfig);
     }, [
       translateX,
@@ -163,14 +165,6 @@ const SwipeableCard = forwardRef<
     const inputRangeY = React.useMemo(() => {
       return translateYRange ?? [];
     }, [translateYRange]);
-    const rotateX = useDerivedValue(() => {
-      return interpolate(
-        translateX.value,
-        rotateInputRange ?? [],
-        rotateOutputRange ?? [],
-        'clamp'
-      );
-    }, [inputRangeX]);
 
     const gesture = Gesture.Pan()
       .onBegin(() => {
@@ -255,16 +249,14 @@ const SwipeableCard = forwardRef<
       });
 
     const rCardStyle = useAnimatedStyle(() => {
-      const opacity = withTiming(index - activeIndex.value < 5 ? 1 : 0);
-      const scale = withTiming(1 - 0.07 * (index - activeIndex.value));
+      const scale = withTiming(index >= totalLength - 2  && activeIndex.value !== index ? 0.9 : 1);
+
       return {
-        opacity,
+        opacity: scale,
         position: 'absolute',
         zIndex: -index,
         transform: [
-          { rotate: `${rotateX.value}rad` },
-
-          { scale: scale },
+          { scaleY: scale },
           {
             translateX: translateX.value,
           },

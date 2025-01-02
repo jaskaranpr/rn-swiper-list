@@ -58,7 +58,7 @@ const Swiper = <T,>(
     swipeLeftSpringConfig = SWIPE_SPRING_CONFIG,
     swipeTopSpringConfig = SWIPE_SPRING_CONFIG,
     swipeBottomSpringConfig = SWIPE_SPRING_CONFIG,
-    loop = false,
+    loop = true
   }: SwiperOptions<T>,
   ref: ForwardedRef<SwiperCardRefType>
 ) => {
@@ -86,13 +86,24 @@ const Swiper = <T,>(
     [swipeLeft, swipeRight, swipeBack, swipeTop, swipeBottom]
   );
 
+  const handleSwipeEnd = ()=>{
+    onSwipedAll && onSwipedAll()
+    setTimeout(() => {
+      for (let i = 0; i < data.length; i++) {
+        refs[i]?.current?.swipeBack();
+      }
+      setTimeout(() => {activeIndex.value = 0}, 100);
+    }, 100)
+    
+  }
+
   useAnimatedReaction(
     () => {
       return activeIndex.value >= data.length;
     },
     (isSwipingFinished: boolean) => {
-      if (isSwipingFinished && onSwipedAll) {
-        runOnJS(onSwipedAll)();
+      if (isSwipingFinished) {
+        runOnJS(handleSwipeEnd)();
       }
     },
     [data]
@@ -118,6 +129,7 @@ const Swiper = <T,>(
           key={index}
           cardStyle={cardStyle}
           index={index}
+          totalLength={data?.length}
           disableRightSwipe={disableRightSwipe}
           disableLeftSwipe={disableLeftSwipe}
           disableTopSwipe={disableTopSwipe}
