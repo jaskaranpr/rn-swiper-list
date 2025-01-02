@@ -5,11 +5,10 @@ import type { SwiperCardRefType, SwiperOptions } from 'rn-swiper-list';
 
 import useSwipeControls from './hooks/useSwipeControls';
 import SwiperCard from './SwiperCard';
-import type { SpringConfig } from 'react-native-reanimated/lib/typescript/reanimated2/animation/springUtils';
 
 const { width: windowWidth, height: windowHeight } = Dimensions.get('screen');
 
-const SWIPE_SPRING_CONFIG: SpringConfig = {
+const SWIPE_SPRING_CONFIG: any = {
   damping: 20,
   stiffness: 50,
   mass: 1,
@@ -58,10 +57,10 @@ const Swiper = <T,>(
     swipeLeftSpringConfig = SWIPE_SPRING_CONFIG,
     swipeTopSpringConfig = SWIPE_SPRING_CONFIG,
     swipeBottomSpringConfig = SWIPE_SPRING_CONFIG,
-    loop = true
   }: SwiperOptions<T>,
   ref: ForwardedRef<SwiperCardRefType>
 ) => {
+  const loop = true
   const {
     activeIndex,
     refs,
@@ -86,15 +85,15 @@ const Swiper = <T,>(
     [swipeLeft, swipeRight, swipeBack, swipeTop, swipeBottom]
   );
 
-  const handleSwipeEnd = ()=>{
+  const handleSwipeEnd = () => {
     onSwipedAll && onSwipedAll()
     setTimeout(() => {
       for (let i = 0; i < data.length; i++) {
         refs[i]?.current?.swipeBack();
       }
-      setTimeout(() => {activeIndex.value = 0}, 100);
+      setTimeout(() => { activeIndex.value = 0 }, 100);
     }, 100)
-    
+
   }
 
   useAnimatedReaction(
@@ -162,16 +161,16 @@ const Swiper = <T,>(
           OverlayLabelTop={OverlayLabelTop}
           OverlayLabelBottom={OverlayLabelBottom}
           ref={refs[index]}
-          onSwipeRight={(cardIndex) => {
+          onSwipeRight={(cardIndex: any) => {
             onSwipeRight?.(cardIndex);
           }}
-          onSwipeLeft={(cardIndex) => {
+          onSwipeLeft={(cardIndex: any) => {
             onSwipeLeft?.(cardIndex);
           }}
-          onSwipeTop={(cardIndex) => {
+          onSwipeTop={(cardIndex: any) => {
             onSwipeTop?.(cardIndex);
           }}
-          onSwipeBottom={(cardIndex) => {
+          onSwipeBottom={(cardIndex: any) => {
             onSwipeBottom?.(cardIndex);
           }}
           onSwipeStart={onSwipeStart}
@@ -192,7 +191,7 @@ const Swiper = <T,>(
 };
 
 function fixedForwardRef<T, P = {}>(
-  render: (props: P, ref: React.Ref<T>) => React.ReactNode
+  render: any
 ): (props: P & React.RefAttributes<T>) => React.ReactNode {
   return React.forwardRef(render) as any;
 }

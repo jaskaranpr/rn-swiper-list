@@ -23,7 +23,7 @@ import OverlayLabel from './OverlayLabel';
 
 const SwipeableCard = forwardRef<
   SwiperCardRefType,
-  PropsWithChildren<SwiperCardOptions>
+  PropsWithChildren<any>
 >(
   (
     {
