@@ -12,12 +12,11 @@ import Animated, {
   interpolate,
   runOnJS,
   useAnimatedStyle,
-  useDerivedValue,
   useSharedValue,
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import type { SwiperCardOptions, SwiperCardRefType } from 'rn-swiper-list';
+import type { SwiperCardRefType } from 'rn-swiper-list';
 
 import OverlayLabel from './OverlayLabel';
 
@@ -42,8 +41,6 @@ const SwipeableCard = forwardRef<
       disableBottomSwipe,
       translateXRange,
       translateYRange,
-      rotateInputRange,
-      rotateOutputRange,
       inputOverlayLabelRightOpacityRange,
       outputOverlayLabelRightOpacityRange,
       inputOverlayLabelLeftOpacityRange,
