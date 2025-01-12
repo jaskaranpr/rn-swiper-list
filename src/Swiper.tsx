@@ -1,5 +1,9 @@
 import React, { useImperativeHandle, type ForwardedRef } from 'react';
-import { runOnJS, useAnimatedReaction } from 'react-native-reanimated';
+import {
+  runOnJS,
+  useAnimatedReaction,
+  useSharedValue,
+} from 'react-native-reanimated';
 import { Dimensions } from 'react-native';
 import type { SwiperCardRefType, SwiperOptions } from 'rn-swiper-list';
 
@@ -60,7 +64,7 @@ const Swiper = <T,>(
   }: SwiperOptions<T>,
   ref: ForwardedRef<SwiperCardRefType>
 ) => {
-  const loop = true
+  const loop = true;
   const {
     activeIndex,
     refs,
@@ -70,6 +74,7 @@ const Swiper = <T,>(
     swipeTop,
     swipeBottom,
   } = useSwipeControls(data, loop);
+  const lastZIndex = useSharedValue(-(data?.length + 1));
 
   useImperativeHandle(
     ref,
@@ -86,15 +91,9 @@ const Swiper = <T,>(
   );
 
   const handleSwipeEnd = () => {
-    onSwipedAll && onSwipedAll()
-    setTimeout(() => {
-      for (let i = 0; i < data.length; i++) {
-        refs[i]?.current?.swipeBack();
-      }
-      setTimeout(() => { activeIndex.value = 0 }, 100);
-    }, 100)
-
-  }
+    onSwipedAll && onSwipedAll();
+    activeIndex.value = 0;
+  };
 
   useAnimatedReaction(
     () => {
@@ -129,6 +128,7 @@ const Swiper = <T,>(
           cardStyle={cardStyle}
           index={index}
           totalLength={data?.length}
+          lastZIndex={lastZIndex}
           disableRightSwipe={disableRightSwipe}
           disableLeftSwipe={disableLeftSwipe}
           disableTopSwipe={disableTopSwipe}

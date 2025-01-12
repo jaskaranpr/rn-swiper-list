@@ -14,21 +14,17 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withTiming,
 } from 'react-native-reanimated';
 import type { SwiperCardRefType } from 'rn-swiper-list';
 
 import OverlayLabel from './OverlayLabel';
 
-const SwipeableCard = forwardRef<
-  SwiperCardRefType,
-  PropsWithChildren<any>
->(
+const SwipeableCard = forwardRef<SwiperCardRefType, PropsWithChildren<any>>(
   (
     {
       index,
-      totalLength,
       activeIndex,
+      lastZIndex,
       onSwipeLeft,
       onSwipeRight,
       onSwipeTop,
@@ -58,18 +54,20 @@ const SwipeableCard = forwardRef<
       onSwipeEnd,
       swipeBackXSpringConfig,
       swipeBackYSpringConfig,
-      swipeRightSpringConfig,
-      swipeLeftSpringConfig,
       swipeTopSpringConfig,
       swipeBottomSpringConfig,
     },
     ref
   ) => {
-    const intValue = totalLength - 1 === index ? -30 : totalLength - 2 === index ? 30 : 0
+    const swipeSpringConfig = {
+      duration: 400,
+    };
+    const intValue = 0;
     const translateX = useSharedValue(intValue);
     const translateY = useSharedValue(0);
     const currentActiveIndex = useSharedValue(Math.floor(activeIndex.value));
     const nextActiveIndex = useSharedValue(Math.floor(activeIndex.value));
+    const zIndexValue = useSharedValue(-index);
 
     const { width, height } = useWindowDimensions();
     const maxCardTranslation = width * 1.5;
@@ -77,7 +75,15 @@ const SwipeableCard = forwardRef<
 
     const swipeRight = useCallback(() => {
       onSwipeRight?.(index);
-      translateX.value = withSpring(maxCardTranslation, swipeRightSpringConfig);
+      zIndexValue.value = lastZIndex.value;
+      lastZIndex.value = lastZIndex.value - 1;
+      translateX.value = withSpring(
+        maxCardTranslation,
+        swipeSpringConfig,
+        () => {
+          translateX.value = 0;
+        }
+      );
       activeIndex.value++;
     }, [
       index,
@@ -85,12 +91,20 @@ const SwipeableCard = forwardRef<
       maxCardTranslation,
       onSwipeRight,
       translateX,
-      swipeRightSpringConfig,
+      swipeSpringConfig,
     ]);
 
     const swipeLeft = useCallback(() => {
       onSwipeLeft?.(index);
-      translateX.value = withSpring(-maxCardTranslation, swipeLeftSpringConfig);
+      zIndexValue.value = lastZIndex.value;
+      lastZIndex.value = lastZIndex.value - 1;
+      translateX.value = withSpring(
+        -maxCardTranslation,
+        swipeSpringConfig,
+        () => {
+          translateX.value = 0;
+        }
+      );
       activeIndex.value++;
     }, [
       index,
@@ -98,12 +112,20 @@ const SwipeableCard = forwardRef<
       maxCardTranslation,
       onSwipeLeft,
       translateX,
-      swipeLeftSpringConfig,
+      swipeSpringConfig,
     ]);
 
     const swipeTop = useCallback(() => {
       onSwipeTop?.(index);
-      translateY.value = withSpring(-maxCardTranslationY, swipeTopSpringConfig);
+      zIndexValue.value = lastZIndex.value;
+      lastZIndex.value = lastZIndex.value - 1;
+      translateY.value = withSpring(
+        -maxCardTranslationY,
+        swipeTopSpringConfig,
+        () => {
+          translateY.value = 0;
+        }
+      );
       activeIndex.value++;
     }, [
       index,
@@ -116,9 +138,14 @@ const SwipeableCard = forwardRef<
 
     const swipeBottom = useCallback(() => {
       onSwipeBottom?.(index);
+      zIndexValue.value = lastZIndex.value;
+      lastZIndex.value = lastZIndex.value - 1;
       translateY.value = withSpring(
         maxCardTranslationY,
-        swipeBottomSpringConfig
+        swipeBottomSpringConfig,
+        () => {
+          translateY.value = 0;
+        }
       );
       activeIndex.value++;
     }, [
@@ -246,20 +273,16 @@ const SwipeableCard = forwardRef<
       });
 
     const rCardStyle = useAnimatedStyle(() => {
-      const scale = withTiming(index >= totalLength - 2  && activeIndex.value !== index ? 0.9 : 1);
-
       return {
-        opacity: scale,
         position: 'absolute',
-        zIndex: -index,
+        zIndex: zIndexValue.value,
         transform: [
-          { scaleY: scale },
           {
             translateX: translateX.value,
           },
-          {
-            translateY: translateY.value,
-          },
+          // {
+          //   translateY: translateY.value,
+          // },
         ],
       };
     });
