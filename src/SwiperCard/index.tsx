@@ -191,6 +191,7 @@ const SwipeableCard = forwardRef<SwiperCardRefType, PropsWithChildren<any>>(
     }, [translateYRange]);
 
     const gesture = Gesture.Pan()
+      .activeOffsetX([-10, 10])
       .onBegin(() => {
         currentActiveIndex.value = Math.floor(activeIndex.value);
         if (onSwipeStart) runOnJS(onSwipeStart)();
