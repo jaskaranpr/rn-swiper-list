@@ -190,8 +190,11 @@ const SwipeableCard = forwardRef<SwiperCardRefType, PropsWithChildren<any>>(
       return translateYRange ?? [];
     }, [translateYRange]);
 
+    const activeOffSetXLeft = disableLeftSwipe ? -200 : -10;
+    const activeOffSetXRight = disableRightSwipe ? 200 : 10;
+
     const gesture = Gesture.Pan()
-      .activeOffsetX([-10, 10])
+      .activeOffsetX([activeOffSetXLeft, activeOffSetXRight])
       .onBegin(() => {
         currentActiveIndex.value = Math.floor(activeIndex.value);
         if (onSwipeStart) runOnJS(onSwipeStart)();
@@ -199,6 +202,9 @@ const SwipeableCard = forwardRef<SwiperCardRefType, PropsWithChildren<any>>(
       .onUpdate((event) => {
         if (currentActiveIndex.value !== index) return;
         if (onSwipeActive) runOnJS(onSwipeActive)();
+
+        if (disableLeftSwipe && event.translationX < 0) return;
+        if (disableRightSwipe && event.translationX > 0) return;
 
         translateX.value = event.translationX;
         translateY.value = event.translationY;
@@ -229,6 +235,7 @@ const SwipeableCard = forwardRef<SwiperCardRefType, PropsWithChildren<any>>(
         );
       })
       .onFinalize((event) => {
+        if (translateX.value === 0 && translateY.value === 0) return;
         if (currentActiveIndex.value !== index) return;
         if (onSwipeEnd) runOnJS(onSwipeEnd)();
         if (nextActiveIndex.value === activeIndex.value + 1) {
